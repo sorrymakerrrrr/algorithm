@@ -4,51 +4,68 @@
  * and open the template in the editor.
  */
 package Sort;
+
+import java.util.Arrays;
+import java.lang.Math;
+
 /**
- * 非递归版本
+ *
  * @author Xinnze
  */
-
-import java.util.*;
-
-
-public class MergeSort2 {
-    public static void mergeSort2(int [] arr) {
-        if (arr == null || arr.length < 2)
+public class Text {
+    
+    //radixSort
+    public static void radixSort(int [] arr){
+        if(arr == null || arr.length < 2)
             return ;
-        
-        int len = 1;
-        while(len <= arr.length){
-            // 循环终止条件 ： 剩下元素不超过一组时
-            for(int i = 0; i + len < arr.length; i += 2 * len){
-                int L = i;
-                int R = i + 2 * len - 1;
-                int M = L + (R - L) / 2;
-                
-                // 子表个数为奇数时 最后一个子表无需与其他子表进行排序
-                // 子表个数为偶数时，最后一个子表需要与前一个表进行排序
-                if(R > arr.length - 1)
-                    R = arr.length - 1;
-                merge(arr, L, M, R);
+        int bit = maxbits(arr);
+        radixSort(arr, 0, arr.length - 1, bit);
+    }
+    
+    public static void radixSort(int []arr, int L, int R, int bit){
+        int[] bucket = new int[R - L + 1];
+        for(int d = 1; d <= bit; d++){
+            int[] radix = new int[10];
+            for(int i = L; i <= R; i++){
+                int num = ((arr[i] / (int)Math.pow(10, d - 1)) % 10);
+                radix[num]++;
             }
-            len = 2 * len;
+            for(int i = 1; i < radix.length; i++){
+                radix[i] = radix[i - 1] + radix[i];
+            }
+            
+            for(int i = R; i >= L; i--){
+                int num = ((arr[i] / (int)Math.pow(10, d - 1)) % 10);
+                bucket[--radix[num]] = arr[i];
+            }
+            for(int i = 0; i < R - L + 1; i++){
+                arr[L + i] = bucket[i];
+            }
         }
     }
     
-    public static void merge(int [] arr, int L, int M, int R){
-        int[] help = new int[R - L + 1];
-        int i = 0;
-        int p1 = L;
-        int p2 = M + 1;
-        while(p1 <= M && p2 <= R)
-            help[i++] = (arr[p1] < arr[p2]) ? arr[p1++] : arr[p2++] ;
-        while(p1 <= M)
-            help[i++] = arr[p1++];
-        while(p2 <= R)
-            help[i++] = arr[p2++];
-        for (i = 0; i < R - L + 1; i++)
-            arr[L + i] = help[i];
+    public static int maxbits(int [] arr){
+        int maxindex = 0;
+        for(int i = 0; i < arr.length; i++){
+            maxindex = (arr[i] > arr[maxindex]) ? i : maxindex;
+        }
+        int bit = 0;
+        int maximum = arr[maxindex];
+        while(maximum != 0){
+            bit++;
+            maximum /= 10;
+        }
+        return bit;
     }
+    
+    
+
+    public static void swap(int [] arr, int i, int j){
+        int tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
+    }
+    
     
     public static void comparator(int [] arr){
         Arrays.sort(arr);
@@ -60,7 +77,7 @@ public class MergeSort2 {
         // int(Math.random() * A) -> [0, A-1] int
         int[] arr = new int[(int)((maxSize + 1) * Math.random())];
         for (int i = 0; i < arr.length; i++){
-            arr[i] = (int)((maxValue + 1) * Math.random()) - (int)((maxValue) * Math.random());
+            arr[i] = (int)(maxValue * Math.random());
         }
         return arr;
     }
@@ -108,7 +125,7 @@ public class MergeSort2 {
         for (int i = 0; i < testTime; i++){
             int[] arr1 = generateRandomArray(maxSize, maxValue);
             int[] arr2 = copyArray(arr1);
-            mergeSort2(arr1);
+            radixSort(arr1);
             comparator(arr2);
             if (!isEqual(arr1, arr2)){
                 succeed = false;
@@ -120,5 +137,4 @@ public class MergeSort2 {
         }
         System.out.println(succeed ? "Nice!" : "Shit!");
     }
-    
 }

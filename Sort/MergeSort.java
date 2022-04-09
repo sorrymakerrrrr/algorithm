@@ -8,7 +8,7 @@ package Sort;
 import java.util.Arrays;
 
 /**
- *
+ * 递归版本
  * @author Xinnze
  */
 public class MergeSort {
@@ -21,12 +21,14 @@ public class MergeSort {
     }
     
     public static void process(int[] arr, int left, int right){
-        if (left == right)
-            return;
+//        if (left == right)
+//            return;
+        if(left < right){
         int mid = left + ((right - left) >> 1);
         process(arr, left, mid);
         process(arr, mid + 1, right);
         merge(arr, left, right, mid);
+        }
     }
     
     public static void merge(int[] arr, int l, int r, int m){

@@ -4,52 +4,55 @@
  * and open the template in the editor.
  */
 package Sort;
+
+import java.util.Arrays;
+
 /**
- * 非递归版本
+ * 真正的快排
  * @author Xinnze
  */
-
-import java.util.*;
-
-
-public class MergeSort2 {
-    public static void mergeSort2(int [] arr) {
+public class QuickSort {
+    
+    public static void quickSort(int [] arr){
         if (arr == null || arr.length < 2)
             return ;
-        
-        int len = 1;
-        while(len <= arr.length){
-            // 循环终止条件 ： 剩下元素不超过一组时
-            for(int i = 0; i + len < arr.length; i += 2 * len){
-                int L = i;
-                int R = i + 2 * len - 1;
-                int M = L + (R - L) / 2;
-                
-                // 子表个数为奇数时 最后一个子表无需与其他子表进行排序
-                // 子表个数为偶数时，最后一个子表需要与前一个表进行排序
-                if(R > arr.length - 1)
-                    R = arr.length - 1;
-                merge(arr, L, M, R);
-            }
-            len = 2 * len;
+        process(arr, 0, arr.length - 1);
+    }
+    
+    public static void process(int [] arr, int L, int R){
+        //只有在 L < R 时才执行操作
+        if (L < R){
+            // 将[L, R]范围的随机的一个数放到最后一位上
+            swap(arr, L + (int)(Math.random() * (R - L + 1)), R);
+            int[] p = partition(arr, L, R);  // 做partition操作
+            process(arr, L, p[0] - 1);
+            process(arr, p[1] + 1, R);
         }
     }
     
-    public static void merge(int [] arr, int L, int M, int R){
-        int[] help = new int[R - L + 1];
-        int i = 0;
-        int p1 = L;
-        int p2 = M + 1;
-        while(p1 <= M && p2 <= R)
-            help[i++] = (arr[p1] < arr[p2]) ? arr[p1++] : arr[p2++] ;
-        while(p1 <= M)
-            help[i++] = arr[p1++];
-        while(p2 <= R)
-            help[i++] = arr[p2++];
-        for (i = 0; i < R - L + 1; i++)
-            arr[L + i] = help[i];
+    //这里的partition的target值就是arr[R]
+    public static int [] partition(int[] arr, int L, int R){
+        int i = L;
+        int less = L - 1;
+        int more = R;
+        while(i < more){
+            if (arr[i] < arr[R]){
+                swap(arr, ++less, i++);
+            }else if(arr[i] == arr[R]){
+                i++;
+            }else{
+                swap(arr, i, --more);
+            }
+        }
+        swap(arr, more, R);
+        return new int[]{less + 1, more};
     }
     
+    public static void swap(int [] arr, int i, int j){
+        int tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
+    }
     public static void comparator(int [] arr){
         Arrays.sort(arr);
     }
@@ -108,7 +111,7 @@ public class MergeSort2 {
         for (int i = 0; i < testTime; i++){
             int[] arr1 = generateRandomArray(maxSize, maxValue);
             int[] arr2 = copyArray(arr1);
-            mergeSort2(arr1);
+            quickSort(arr1);
             comparator(arr2);
             if (!isEqual(arr1, arr2)){
                 succeed = false;
@@ -120,5 +123,4 @@ public class MergeSort2 {
         }
         System.out.println(succeed ? "Nice!" : "Shit!");
     }
-    
 }
