@@ -1,26 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Graph;
-
-/**
- * @author Xinnze
- */
-
-import Graph.MyGraphDefine.*;
 
 import java.util.*;
 
-public class GraphBFS {
+import Graph.MyGraphDefine.*;
+
+public class GraphDFS {
     public static Graph createGraph(Integer[][] matrix) {
         Graph graph = new Graph();
-        for (int i = 0; i < matrix.length; i++) {
-            Integer weight = matrix[i][0];
-            Integer from = matrix[i][1];
-            Integer to = matrix[i][2];
-
+        for (Integer[] value : matrix) {
+            Integer weight = value[0];
+            Integer from = value[1];
+            Integer to = value[2];
             if (!graph.nodes.containsKey(from)) {
                 graph.nodes.put(from, new Node(from));
             }
@@ -39,20 +29,22 @@ public class GraphBFS {
         return graph;
     }
 
-    public static void BFS(Node node) {
-        // 从node出发进行宽度优先遍历
+    public static void DFS(Node node) {
         if (node == null) return;
-        Queue<Node> queue = new LinkedList<>();
+        Stack<Node> st = new Stack<>();
         HashSet<Node> set = new HashSet<>();
+        st.push(node);
         set.add(node);
-        queue.add(node);
-        while (!queue.isEmpty()) {
-            Node cur = queue.poll();
-            System.out.println(cur.value);
+        System.out.println(node.value);
+        while (!st.isEmpty()) {
+            Node cur = st.pop();
             for (Node next : cur.nexts) {
                 if (!set.contains(next)) {
                     set.add(next);
-                    queue.add(next);
+                    st.push(cur);
+                    st.push(next);
+                    System.out.println(next.value);
+                    break;
                 }
             }
         }
@@ -69,7 +61,6 @@ public class GraphBFS {
         matrix[6] = new Integer[]{1, 2, 16};
 //        System.out.println(matrix[0][1]);
         Graph graph = createGraph(matrix);
-        BFS(graph.nodes.get(1));
-//        System.out.println(graph.edges.isEmpty());
+        DFS(graph.nodes.get(1));
     }
 }

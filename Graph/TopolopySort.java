@@ -1,26 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Graph;
-
-/**
- * @author Xinnze
- */
-
-import Graph.MyGraphDefine.*;
 
 import java.util.*;
 
-public class GraphBFS {
+import Graph.MyGraphDefine.*;
+
+public class TopolopySort {
     public static Graph createGraph(Integer[][] matrix) {
         Graph graph = new Graph();
-        for (int i = 0; i < matrix.length; i++) {
-            Integer weight = matrix[i][0];
-            Integer from = matrix[i][1];
-            Integer to = matrix[i][2];
-
+        for (Integer[] value : matrix) {
+            Integer weight = value[0];
+            Integer from = value[1];
+            Integer to = value[2];
             if (!graph.nodes.containsKey(from)) {
                 graph.nodes.put(from, new Node(from));
             }
@@ -30,34 +20,39 @@ public class GraphBFS {
             Node fromNode = graph.nodes.get(from);
             Node toNode = graph.nodes.get(to);
             Edge newEdge = new Edge(weight, fromNode, toNode);
-            fromNode.nexts.add(toNode);
             fromNode.out++;
-            toNode.in++;
             fromNode.edges.add(newEdge);
+            fromNode.nexts.add(toNode);
+            toNode.in++;
             graph.edges.add(newEdge);
         }
         return graph;
     }
 
-    public static void BFS(Node node) {
-        // 从node出发进行宽度优先遍历
-        if (node == null) return;
-        Queue<Node> queue = new LinkedList<>();
-        HashSet<Node> set = new HashSet<>();
-        set.add(node);
-        queue.add(node);
-        while (!queue.isEmpty()) {
-            Node cur = queue.poll();
-            System.out.println(cur.value);
-            for (Node next : cur.nexts) {
-                if (!set.contains(next)) {
-                    set.add(next);
-                    queue.add(next);
+    public static List<Integer> sortTopology(Graph graph) {
+        // key 某一结点的node
+        // value 该节点的入度
+        HashMap<Node, Integer> inMap = new HashMap<>();
+        Queue<Node> zerosInNode = new LinkedList<>();
+        for (Node node : graph.nodes.values()) {
+            inMap.put(node, node.in);
+            if (node.in == 0) {
+                zerosInNode.add(node);
+            }
+        }
+        List<Integer> res = new ArrayList<>();
+        while (!zerosInNode.isEmpty()){
+            Node cur = zerosInNode.poll();
+            res.add(cur.value);
+            for (Node next : cur.nexts){
+                inMap.put(next, inMap.get(next) - 1);
+                if (inMap.get(next) == 0){
+                    zerosInNode.add(next);
                 }
             }
         }
+        return res;
     }
-
     public static void main(String[] args) {
         Integer[][] matrix = new Integer[7][3];
         matrix[0] = new Integer[]{1, 1, 3};
@@ -69,7 +64,7 @@ public class GraphBFS {
         matrix[6] = new Integer[]{1, 2, 16};
 //        System.out.println(matrix[0][1]);
         Graph graph = createGraph(matrix);
-        BFS(graph.nodes.get(1));
-//        System.out.println(graph.edges.isEmpty());
+        List<Integer> res = sortTopology(graph);
+        System.out.println(res);
     }
 }
